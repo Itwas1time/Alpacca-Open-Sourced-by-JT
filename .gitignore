@@ -1,0 +1,25 @@
+# python
+__pycache__/
+*.pyc
+*.egg-info/
+build/
+dist/
+.venv/
+
+# editors
+.vscode/
+.idea/
+*.swp
+
+# local test artifacts and model downloads (never commit weights)
+.smoke-home/
+*.gguf
+
+# Secrets and local state
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.alpaccaroo/
+proof_runs/

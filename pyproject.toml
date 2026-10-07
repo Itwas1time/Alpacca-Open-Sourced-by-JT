@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "alpaccaroo"
+version = "0.2.0"
+description = "LLMs in your terminal - a from-scratch, pure-Python GGUF inference engine with Ollama-style model management"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+# Intentionally empty: alpaccaroo runs on the standard library alone.
+# NumPy, if installed, is auto-detected and used as an accelerator.
+dependencies = []
+
+[project.optional-dependencies]
+fast = ["numpy"]
+# our own Python-source kernels, JIT-compiled by a PINNED numba; the pin
+# is a validated pair with this code and is never bumped implicitly
+kernels = ["numpy", "numba==0.65.1", "threadpoolctl"]
+# our own Python-source CUDA kernels (alpaccaroo/cuda.py), JIT-compiled by a
+# PINNED numba-cuda; same policy as [kernels] - the set below is a
+# validated combination and is never bumped implicitly. nvidia-nvjitlink
+# is load-bearing: without it cuda.core can silently pick up a torch
+# wheel's stale nvJitLink DLL and every kernel dies with
+# ERROR_OUTDATED_LIBRARY(14).
+gpu = [
+    "numpy",
+    "numba==0.65.1",
+    "numba-cuda==0.30.4",
+    "threadpoolctl",
+    "cuda-bindings==13.3.1",
+    "cuda-core==1.1.1",
+    "cuda-pathfinder==1.6.0",
+    "nvidia-cuda-nvrtc==13.3.33",
+    "nvidia-nvvm==13.3.33",
+    "nvidia-nvjitlink==13.3.33",
+    "nvidia-cuda-runtime==13.3.29",
+    "nvidia-cuda-cccl==13.2.86",
+]
+# AMD's supported container supplies its pinned PyTorch/Triton ROCm wheels.
+# Installing a generic PyPI torch wheel here could replace them with a CUDA or
+# CPU build, so this extra adds only Alpaccaroo's shared Python dependencies.
+rocm = ["numpy", "threadpoolctl"]
+
+[project.scripts]
+alpaccaroo = "alpaccaroo.cli:main"
+
+[tool.setuptools]
+packages = ["alpaccaroo"]
